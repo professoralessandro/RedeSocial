@@ -2,66 +2,105 @@
 <?php include_once("../../Conexao/Conexao.php"); ?>
 <?php include_once("../../Model/Usuario.php"); ?>
 <?php include_once("../../Controller/DALUsuario.php"); ?>
-<?php include_once("../../Conexao/Validacao.php"); ?>
+<?php include_once("../../Conexao/Validacao.php"); ?>a
 <?php
-if (isset($_POST['email']) && isset($_POST['senha'])) {
-    $conexao = new Conexao();
+$conexao = new Conexao();
 
-    $dalUsuario = new DALUsuario($conexao);
+$dalUsuario = new DALUsuario($conexao);
 
-    $email = trim($_POST['email']); //Escapar de injeção sql
+$validacao = new Validacao();
 
-    $senha = trim($_POST['senha']);
-
-    $validacao = new Validacao();
-
-    //echo($email." ".$senha);
-
-    $result = $dalUsuario->altenticarUsuario($email, $senha);
-
-    //print_r($result);
-
-    $resultado = mysqli_fetch_assoc($result);
-
-    //print_r($resultado);
-
-    if (empty($resultado)) {
+if (isset($_POST['deslogar'])) {
+    $logof = $validacao->Deslogar();
+    if (!$logof) {
         echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=index.php'>
-		<script type= \"text/javascript\">
-		alert(\"Erro ao logar. Por favor verifique login e senha, tente novamente.\");
-		</script>";
-    } elseif (isset($resultado)) {
-        $usuario = new Usuario($resultado['idUsuario'], $resultado['nome'], $resultado['dataNascimento'], $resultado['dataCadastro'], $resultado['email'], $resultado['senha'], $resultado['nivelAcesso'], $resultado['ddd'], $resultado['telefone'], $resultado['sexo'], $resultado['imagem']);
-
-        $login = $validacao->logar($usuario);
-        if (!$login) {
-            echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=Classes/View/Usuario/home.php'>
-			<script type= \"text/javascript\">
-			alert(\"seja bem vindo {$resultado['nome']} \");
-			</script>";
-        } else {
-            echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=index.php'>
-			<script type= \"text/javascript\">
-			alert(\"Erro ao logar. Por favor verifique login e senha, tente novamente 2.\");
-			</script>";
-        }
-    } else if (isset($_POST['deslogar'])) {
-        echo("Esta aqui");
-
-        $logof = $validacao->Deslogar();
-        if (!$logof) {
-            echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=index.php'>
 		<script type= \"text/javascript\">
 		alert(\"seja bem vindo {$resultado['nome']} .\");
 		</script>";
-        } else {
-            echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=index.php'>
+    } else {
+        echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=index.php'>
 		<script type= \"text/javascript\">
 		alert(\"Erro ao logar. Por favor verifique login e senha, tente novamente 2.\");
 		</script>";
-        }
     }
 }
+if (isset($_POST['cadastrar']) && $_POST['cadastrar'] != null) {
+    $nome = trim($_POST['nome']);
+
+//TRATAMENTO CPF
+    $cpf = trim($_POST['cpf']);
+    $cpf = $dalUsuario->tratarCaracteres($cpf);
+
+    $dataNascimento = trim($_POST['dataNascimento']);
+    $dataCadastro = date('Y-m-d');
+    $sexo = trim($_POST['sexo']);
+    $email = trim($_POST['email']);
+    $nivelAcesso = trim($_POST['nivelAcesso']);
+
+//TRATAMENTO DDD
+    $ddd = trim($_POST['ddd']);
+    $ddd = $dalUsuario->tratarCaracteres($ddd);
+
+//TRATAMENTO TELEFONE
+    $telefone = trim($_POST['telefone']);
+    $telefone = $dalUsuario->tratarCaracteres($telefone);
+
+    $senha = trim($_POST['senha']);
+    $confirmarSenha = trim($_POST['confirmarSenha']);
+    $imagem = trim($_FILES['imagem']['name']);
+    $temp = trim($_FILES['imagem']['tmp_name']);
+    $size = trim($_FILES['imagem']['size']);
+
+    $usuario = new Usuario(1, $nome, $cpf, $dataNascimento, $dataCadastro, $email, $senha, $nivelAcesso, $ddd, $telefone, $sexo, $imagem);
+    //print_r($usuario);
+    
+    //TESTE DE VARIAVEIS
+    echo($nome);
+
+    if ($size > 1 || $size < 4001) {
+        if ($_POST['senha'] == $_POST['confirmarSenha']) {
+            $cx = new Conexao();
+            $dalUsuario = new DALUsuario($cx);
+
+            $usuario = new Usuario(1, $nome, $cpf, $dataNascimento, $dataCadastro, $email, $senha, $nivelAcesso, $ddd, $telefone, $sexo, $imagem);
+            
+            move_uploaded_file($temp, "../../../imagens/".$imagem);
+
+            //print_r($pessoa);
+            //print_r($size);
+            //header("Location: CadastroUsuario.php");
+
+            print_r($usuario);
+
+            $cadastroOK = $dalUsuario->inserirUsuario($usuario);
+
+            if ($cadastroOK) {
+                echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=index.php'>
+					<script type= \"text/javascript\">
+					alert(\"O usuário $nome foi cadastrado com sucesso\");
+					</script>";
+            }//CADASTRO USUARIO OK
+            else {
+                echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=#'>
+					<script type= \"text/javascript\">
+					alert(\"Erro ao cadastrar usuário. Tente novamente\");
+					</script>";
+            }//CADASTRO USUARIO OK
+        }//TAMANHO
+        else {
+            echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=#'>
+				<script type= \"text/javascript\">
+				alert(\"Erro ao cadastrar usuário. Por favor verifique as senhas e tente novamente\");
+				</script>";
+        }//SENHAS IGAUS
+    }//TAMANHO
+    else {
+        echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=#'>
+			<script type= \"text/javascript\">
+			alert(\"Erro ao cadastrar o produto. O tamanho do arquivo deve ter até 15MB\");
+			</script>";
+    }//TAMANHO
+}//CAMPOS OBRIGATÓRIOS
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,7 +108,7 @@ if (isset($_POST['email']) && isset($_POST['senha'])) {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Bootstrap Agency Page Template</title>
+        <title>Bo <?php echo($_SESSION['usuarioSexo']); ?></title>
         <!-- Bootstrap -->
         <link href="../../../css/bootstrap-4.0.0.css" rel="stylesheet" type="text/css"/>
     </head>
@@ -93,7 +132,7 @@ if (isset($_POST['email']) && isset($_POST['senha'])) {
                             <?php
                             if (isset($_SESSION['usuarioNome']) && $_SESSION['usuarioNome'] != null) {
                                 ?>
-                                <img class="rounded-circle" src='<?php echo "../../../imagens/" . $_SESSION['usuarioImagem']; ?>' alt="foto de perfil" width="36" height="33" id="imagem" title="foto de perfil" />
+                                <img class="rounded-circle" src='<?php echo "../../../imagens/".$_SESSION['usuarioImagem']; ?>' alt="foto de perfil" width="36" height="33" id="imagem" title="foto de perfil" />
                                 <?php
                                 $conexao = new Conexao();
                                 $dalUsuario = new DALUsuario($conexao);
@@ -209,12 +248,12 @@ if (isset($_POST['email']) && isset($_POST['senha'])) {
                                                     <img title="nivelAcesso" class="rounded-circle" src="../../../images/1246548.png" width="35" height="37" /></label>&nbsp;
                                                 <select class='btn btn-group border-0 text-center font-weight-bold' name="nivelAcesso" id="nivelAcesso" title="Nivel de acesso" type="text">
                                                     <option class='btn btn-group border-0 text-center font-weight-bold' value="">Escolha uma opção</option>
-                                                    <option class='btn btn-group border-0 text-center font-weight-bold' value="Usuario">Usuário</option>
-                                                    <option class='btn btn-group border-0 text-center font-weight-bold' value="Medico">Médico</option>
+                                                    <option class='btn btn-group border-0 text-center font-weight-bold' value="PACIENTE">Paciente</option>
+                                                    <option class='btn btn-group border-0 text-center font-weight-bold' value="MEDICO">Médico</option>
                                                 </select>&nbsp;
                                             </td>
                                             <td align="center"><label for="email"><font class="font-weight-bold" color="#ff0000">*</font>
-                                                    <img title="Email" class="rounded-circle" src="../../../images/email3.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="email" type="email" required="required" id="email" placeholder="Informe o documento" title="email" size="25" maxlength="50">&nbsp;
+                                                    <img title="Email" class="rounded-circle" src="../../../images/email3.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="cpf" type=text" required="required" id="email" placeholder="Informe o documento" title="email" size="25" maxlength="50">&nbsp;
                                             </td>
                                         </tr>
                                         <tr>
@@ -225,7 +264,7 @@ if (isset($_POST['email']) && isset($_POST['senha'])) {
                                                 <label for="senha"><img title="nome de usuário" class="rounded-circle" src="../../../images/lock2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="senha" type="password" required="required" id="senha" placeholder="Informe a senha" title="Senha" size="25" maxlength=50">&nbsp;
                                             </td>
                                             <td align="center"><font class="font-weight-bold" color="#ff0000">*</font>
-                                                <label for="confirmarSenha"><img title="nome de usuário" class="rounded-circle" src="../../../images/lock2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="senha" type="password" required="required" id="confirmarSenha" placeholder="Informe a senha" title="Senha" size="25" maxlength=50">&nbsp;
+                                                <label for="confirmarSenha"><img title="nome de usuário" class="rounded-circle" src="../../../images/lock2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="confirmarSenha" type="password" required="required" id="confirmarSenha" placeholder="Informe a senha" title="Senha" size="25" maxlength=50">&nbsp;
                                             </td>
                                         </tr>
                                         <tr>
@@ -265,16 +304,11 @@ if (isset($_POST['email']) && isset($_POST['senha'])) {
             </div>
         </footer>
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
-        <script src="../js/jquery-3.2.1.min.js"></script> 
+        <script src="../../../js/jquery-3.2.1.min.js"></script> 
         <!-- Include all compiled plugins (below), or include individual files as needed --> 
-        <script src="../js/popper.min.js"></script> 
-        <script src="../js/bootstrap-4.0.0.js"></script>
+        <script src="../../../js/popper.min.js"></script> 
+        <script src="../../../js/bootstrap-4.0.0.js"></script>
     </body>
 </footer>
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="js/jquery-3.2.1.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/popper.min.js"></script>
-<script src="js/bootstrap-4.0.0.js"></script>
 </body>
 </html>

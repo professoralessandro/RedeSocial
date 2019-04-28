@@ -287,7 +287,7 @@ if (isset($_SESSION['usuarioNome'])) {
                                                                         <span id="messageHelp" class="form-text text-muted" style="display: none;">Please enter a message.</span>
                                                                     </div>
                                                                     <input class="btn btn-block btn-lg btn-primary" type="submit" value="Responder" name="responderMensagem" />
-                                                                    <a class="btn btn-block btn-lg btn-danger" href="deletarComentario.php?idComentario =<?php echo $dadosComentario['idComentario'];?>&idUsuario = <?php echo $_SESSION['usuarioId'];?>">Deletar Comentário</a>
+                                                                    <a class="btn btn-block btn-lg btn-danger" href="deletarComentario.php?idComentario =<?php echo $dadosComentario['idComentario'];?>">Deletar Comentário</a>
 
                                                                 </div>
                                                                 </tr>

@@ -3,7 +3,6 @@
 <?php include_once("../../Model/Pessoa.php"); ?>
 <?php include_once("../../Controller/DALCompra.php"); ?>
 <?php include_once("../../Controller/DALPessoa.php"); ?>
-<?php include_once("../../Controller/DALUsuario.php"); ?>
 <?php include_once("../../Conexao/Conexao.php"); ?>
 <?php
 if(isset($_SESSION['usuarioAcessoNiveis']) && $_SESSION['usuarioAcessoNiveis'] != null && $_SESSION['usuarioAcessoNiveis'] == 'Gerente')
@@ -12,10 +11,13 @@ $conexao = new Conexao();
 $dalPessoa = new DALPessoa($conexao);
 $dalCompra = new DALCompra($conexao);
 $dalProduto = new DALProduto($conexao);
-$dalUsuario = new DALUsuario($conexao);
+
+$id = trim(filter_input(INPUT_GET, 'idPessoa', FILTER_SANITIZE_NUMBER_INT));
+
 //POST PHP
-	if(isset($_POST['cadastrar']) && $_POST['cadastrar'] != null)
-	{
+if(isset($_POST['alterar']) && $_POST['alterar'] != null)
+{
+	$idPessoa = trim($_POST['idPessoa']);
 	$nome = trim($_POST['nome']);
 	
 	//TRATAMENTO CPF
@@ -25,13 +27,13 @@ $dalUsuario = new DALUsuario($conexao);
 	//TRATAMENTO RG
 	$rg = "";
 	$rg = $dalUsuario->tratarCpf($rg);
-		
+	
 	$dataNascimento = trim($_POST['dataNascimento']);
-	$dataCadastro = date('Y-m-d');
+	$dataCadastro = "";
 	$sexo = trim($_POST['sexo']);
 	$email = trim($_POST['email']);
 	$nivelAcesso = trim($_POST['nivelAcesso']);
-		
+	
 	//TRATAMENTO DDD
 	$ddd = trim($_POST['ddd']);
 	$ddd = $dalUsuario->tratarDdd($ddd);
@@ -39,82 +41,100 @@ $dalUsuario = new DALUsuario($conexao);
 	//TRATAMENTO TELEFONE
 	$telefone = trim($_POST['telefone']);
 	$telefone = $dalUsuario->tratarTelefone($telefone);
-		
+	
 	$endereco = trim($_POST['endereco']);
 	$complemento = trim($_POST['complemento']);
 	$bairro = trim($_POST['bairro']);
 	$cidade = trim($_POST['cidade']);
 	$estado = trim($_POST['estado']);
-		
+	
 	//TRATAR CEP
 	$cep = trim($_POST['cep']);
 	$cep = $dalUsuario->tratarCep($cep);
-		
+	
 	$senha = trim($_POST['senha']);
 	$confirmarSenha = trim($_POST['confirmarSenha']);
-	$imagem = trim($_FILES['imagem']['name']);
+	$imagemNova = trim($_FILES['imagem']['name']);
 	$temp = trim($_FILES['imagem']['tmp_name']);
 	$size = trim($_FILES['imagem']['size']);
+	$imagemAnt = trim($_POST['imagemAnt']);
 
-	if(isset($_POST['nome']) && $_POST['nome'] != null  && isset($_POST['cpf']) && $_POST['cpf'] != null && isset($_POST['dataNascimento']) && $_POST['dataNascimento'] != null && isset($_POST['sexo']) && $_POST['sexo'] != null && isset($_POST['nivelAcesso']) && $_POST['nivelAcesso'] != null && isset($_POST['ddd']) && $_POST['ddd'] != null && isset($_POST['email']) && $_POST['email'] != null && isset($_POST['telefone']) && $_POST['telefone'] != null && isset($_POST['endereco']) && $_POST['endereco'] != null && isset($_POST['cidade']) && $_POST['cidade'] != null && isset($_POST['estado']) && $_POST['estado'] != null && isset($_POST['cep']) && $_POST['cep'] != null && isset($_POST['senha']) && $_POST['senha'] != null && isset($_POST['confirmarSenha']) && $_POST['confirmarSenha'] != null)
+	if(isset($_POST['nome']) && $_POST['nome'] != null && isset($_POST['nivelAcesso']) && $_POST['nivelAcesso'] != null && isset($_POST['ddd']) && $_POST['ddd'] != null &&  isset($_POST['telefone']) && $_POST['telefone'] != null && isset($_POST['endereco']) && $_POST['endereco'] != null && isset($_POST['cidade']) && $_POST['cidade'] != null && isset($_POST['estado']) && $_POST['estado'] != null && isset($_POST['cep']) && $_POST['cep'] != null && isset($_POST['senha']) && $_POST['senha'] != null && isset($_POST['confirmarSenha']) && $_POST['confirmarSenha'] != null)
 	{
 		if($size > 1 || $size < 4001)
 		{
 			if($_POST['senha'] == $_POST['confirmarSenha'])
-			{
-				$cx = new Conexao();
-				$dalpessoa = new DALPessoa($cx);
+			{	
+				if(isset($imagemNova) && $imagemNova != null && isset($imagemAnt) && $imagemAnt != null)
+				{
+					$pessoa = new Pessoa($idPessoa, $nome, $cpf,$rg ,$dataNascimento,"$dataCadastro", $email, $nivelAcesso, $ddd, $telefone, "", "", $endereco, $complemento, $bairro, $cidade, $estado, $cep, $sexo, $senha, $imagemNova);
 				
-				$pessoa = new Pessoa(1, $nome, $cpf, $rg, $dataNascimento, $dataCadastro, $email, $nivelAcesso, $ddd, $telefone, '', '', $endereco, $complemento, $bairro, $cidade, $estado, $cep, $sexo, $senha, $imagem);
-				
-				move_uploaded_file($temp,"../../../imagens/".$imagem);
-				
+					unlink("../../../imagens/".$imagemAnt);
+
+					move_uploaded_file($temp,"../../../imagens/".$imagemNova);
+				}
+				else if(isset($imagemAnt) && $imagemAnt != null && $imagemNova == null)
+				{
+					$pessoa = new Pessoa($idPessoa, $nome, $cpf,$rg ,$dataNascimento,$dataCadastro, $email, $nivelAcesso, $ddd, $telefone, "", "", $endereco, $complemento, $bairro, $cidade, $estado, $cep, $sexo, $senha, $imagemAnt);
+				}
+				else if($imagemAnt == null && $imagemNova == null)
+				{
+					$pessoa = new Pessoa($idPessoa, $nome, $cpf,$rg ,$dataNascimento,"$dataCadastro", $email, $nivelAcesso, $ddd, $telefone, "", "", $endereco, $complemento, $bairro, $cidade, $estado, $cep, $sexo, $senha, "profile.png");
+				}
+				else if($imagemAnt == null && isset($imagemNova) && $imagemNova != null)
+				{
+					$pessoa = new Pessoa($idPessoa, $nome, $cpf,$rg ,$dataNascimento,"$dataCadastro", $email, $nivelAcesso, $ddd, $telefone, "", "", $endereco, $complemento, $bairro, $cidade, $estado, $cep, $sexo, $senha, $imagemNova);
+					
+					move_uploaded_file($temp,"../../../imagens/".$imagemNova);
+				}
+					
 				//print_r($pessoa);
-				//print_r($size);
 
 				//header("Location: CadastroUsuario.php");
 				
-				$cadastroOK = $dalpessoa->cadastrarPessoa($pessoa);
+				//echo("Imagem anterior: ".$imagemAnt ."/nImagem Nova: ".$imagemNova);
+				
+				$cadastroOK = $dalPessoa->alterarPessoa($pessoa);
 
-				if($cadastroOK)
+				if(!$cadastroOK)
 				{
 					echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://www.chayds.com.br/index.php'>
 					<script type= \"text/javascript\">
-					alert(\"O usuário $nome foi cadastrado com sucesso\");
+					alert(\"O usuário $nome foi alterado com sucesso.\");
 					</script>";
-				}//CADASTRO USUARIO OK
+				}
 				else
 				{
 					echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://www.chayds.com.br/contato_chayds.php'>
 					<script type= \"text/javascript\">
-					alert(\"Erro ao cadastrar usuário. Tente novamente\");
+					alert(\"Erro ao alterar usuário. Tente novamente\");
 					</script>";
-				}//CADASTRO USUARIO OK
-			}//TAMANHO
+				}
+			}//SENHAS IGAUS
 			else
 			{
 				echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://www.chayds.com.br/contato_chayds.php'>
 				<script type= \"text/javascript\">
-				alert(\"Erro ao cadastrar usuário. Por favor verifique as senhas e tente novamente\");
+				alert(\"Erro ao alterar usuário. Por favor verifique as senhas e tente novamente\");
 				</script>";
-			}//SENHAS IGAUS
+			}//SENHAS IGUAIS
 		}//TAMANHO
 		else
 		{
 			echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://www.chayds.com.br/contato_chayds.php'>
 			<script type= \"text/javascript\">
-			alert(\"Erro ao cadastrar o produto. O tamanho do arquivo deve ter até 15MB\");
+			alert(\"Erro ao alterar o produto. O tamanho do arquivo deve ter até 15MB\");
 			</script>";
 		}//TAMANHO
-	}//CAMPOS OBRIGATÓRIOS
+	}//IF CAMPOS OBRIGATORIOS
 	else
 	{
 		echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://www.chayds.com.br/contato_chayds.php'>
 		<script type= \"text/javascript\">
-		alert(\"Erro ao cadastrar o usuário. Por favor verifique os campos obrigatórios e tente novamente\");
+		alert(\"Erro ao alterar o usuário. Por favor verifique os campos obrigatórios e tente novamente\");
 		</script>";
-	}//CAMPOS OBRIGATÓRIOS
-}
+	}//IF CAMPOS OBRIGATORIOS
+}//IF CADASTRAR
 
 //FIM POST PHP
 ?>
@@ -124,7 +144,7 @@ $dalUsuario = new DALUsuario($conexao);
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cadastro de usuários</title>
+    <title>Alterar usuário</title>
     <!-- Bootstrap -->
     <link href="../../../css/bootstrap-4.0.0.css" rel="stylesheet">
 	<link rel="shortcut icon" type="image/x-icon" href="../../../images/favicon.jpg" />
@@ -404,39 +424,43 @@ $dalUsuario = new DALUsuario($conexao);
       </div>
     </div>
     <hr>
-    <h2 class="text-center">CADASTRO DE USUÁRIO</h2>
+    <h2 class="text-center">ALTERAR USUÁRIO</h2>
     <hr>
-<form name="formCadastroUsuario" action="#" target="_self" method="post" enctype="multipart/form-data">
+<?php
+	$resultado = $dalPessoa->localizarPessoa($id);
+		
+	$dados = mysqli_fetch_array($resultado);
+?>
+<form name="formAlteraUsuario" action="#" target="_self" method="post" enctype="multipart/form-data">
     <div class="container" align="center">
-      <table align="center">
-        <tr>
-          <td align="center">
-			  <label for="nome"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="nome de usuário" class="rounded-circle" src="../../../images/1246548.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="nome" type="text" required="required" id="nome" placeholder="Informe o seu nome completo "title="Nome" size="25" maxlength="50">&nbsp;
+      <table class="form_menu2" align="center">
+		<input hidden="hidden" name="idPessoa" value='<?php echo $dados['idPessoa']; ?>' type="text"  title="idPessoa" size="10" maxlength="50">
+        <tr> <input hidden="hidden" name="imagemAnt" type="text" title="imagemAnt" value='<?php echo $dados['imagem'];?>' size="40" maxlength="50">
+			  <td align="center"><label for="nome"><font class="font-weight-bold" color="#ff0000">*</font>
+              <img title="nome de usuário" class="rounded-circle" src="../../../images/1246548.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="nome" type="text" required="required" id="nome" placeholder="Informe o seu nome completo" title="Nome" value='<?php echo $dados['nome'];?>' size="25" maxlength="50">&nbsp;
 		  </td>
-          <td align="center"><label for="cpf"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="cpf" class="rounded-circle" src="../../../images/1246548.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="cpf" type="text" required="required" id="cpf" placeholder="Informe o seu CPF" title="CPF" size="25" maxlength="50">&nbsp;
+          <td align="center"><label for="cpf">
+              <img title="cpf" class="rounded-circle" src="../../../images/1246548.png" width="35" height="37" /></label>&nbsp;<input name="cpf" type="text" disabled="disabled" class='btn btn-group border-0 text-center font-weight-bold' id="cpf" placeholder="Informe o seu CPF" title="cpf" value='<?php echo $dados['cpf'];?>' size="25" maxlength="50">&nbsp;
 		  </td>
-          <td align="center"><label for="dataNascimento"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="dataNascimento" class="rounded-circle" src="../../../images/61469.svg" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="dataNascimento" type="date" required="required" id="dataNascimento" placeholder="Informe o seu email" title="data de nascimento" size="25 maxlength="50">&nbsp;
-		</td>
+          <td align="center"><label for="dataNascimento">
+              <img title="dataNascimento" class="rounded-circle" src="../../../images/61469.svg" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="dataNascimento" type="date" disabled="" id="dataNascimento" placeholder="Informe o seu email (obrigatório)" title="data de nascimento" value='<?php echo $dados['dataNascimento'];?>' size="25 maxlength="50">&nbsp;
+		  </td>
         </tr>
-		<tr>
+        <tr>
 			<td><p>&nbsp;</p></td>
-		</tr>
+		</tr>     
         <tr>
           <td align="center"><label for="sexo"><font class="font-weight-bold" color="#ff0000">*</font>
 			<img title="sexo" class="rounded-circle" src="../../../images/1246548.png" width="35" height="37" /></label>&nbsp;
               <input class='btn btn-group border-0 text-center font-weight-bold' name="sexo" type="radio" id="sexo" title="Sexo masculino" value="F"><h5 class='btn btn-group border-0 text-center font-weight-bold'>
 				  Feminino</h5>
               <input class='btn btn-group border-0 text-center font-weight-bold' name="sexo" type="radio" id="sexo" title="Sexo Feminino" value="M">
-				  <h5 class='btn btn-group border-0 text-center font-weight-bold'>Masculino</h5>
-			  </td>
-          <td align="center"><label for="email"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="Email" class="rounded-circle" src="../../../images/email3.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="email" type="email" required="required" id="email" placeholder="Informe o seu email" title="email" size="25" maxlength="50">&nbsp;
-		  </td>
+				  <h5 class='btn btn-group border-0 text-center font-weight-bold'>Masculino</h5></td>
+          <td align="center"><label for="email">
+			  <font class="font-weight-bold" color="#ff0000">*</font>
+              <label for="email"><img title="Email" class="rounded-circle" src="../../../images/email3.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="email" type="email" required="required" id="email" placeholder="Informe o seu email" title="email" value='<?php echo $dados['email'];?>' size="25" maxlength="50">&nbsp;</td>
           <td align="center"><label for="nivelAcesso"><font class="font-weight-bold" color="#ff0000">*</font>
-			  <img title="nivelAcesso" class="rounded-circle" src="../../../images/1246548.png" width="35" height="37" /></label>&nbsp;
+			  <img title="Nivel de acesso" class="rounded-circle" src="../../../images/1246548.png" width="35" height="37" /></label>&nbsp;
               <select class='btn btn-group border-0 text-center font-weight-bold' name="nivelAcesso" id="nivelAcesso" title="Nivel de acesso" type="text">
                 <option class='btn btn-group border-0 text-center font-weight-bold' value="Gerente">Gerente</option>
                 <option class='btn btn-group border-0 text-center font-weight-bold' value="Acessor">Acessor</option>
@@ -452,21 +476,22 @@ $dalUsuario = new DALUsuario($conexao);
           </blockquote>
 		  </td>
           <td align="center"><label for="ddd"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="ddd" class="rounded-circle" src="../../../images/icon_phone2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="ddd" type="text" required="required" id="ddd" placeholder="Informe o DDD" title="DDD" size="10" maxlength="50">&nbsp;
-          </td>
+              <img title="ddd" class="rounded-circle" src="../../../images/icon_phone2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="ddd" type="text" required="required" id="ddd" placeholder="Informe o DDD" title="DDD" value='<?php echo $dados['ddd1'];?>' size="10" maxlength="50">&nbsp;
+            </td>
           <td align="center"><label for="telefone"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="telefone" class="rounded-circle" src="../../../images/icon_phone2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="telefone" type="text" required="required" id="telefone" placeholder="Informe o seu telefone, somente os números" title="Telefone" size="25" maxlength="50">&nbsp;
+              <img title="telefone" class="rounded-circle" src="../../../images/icon_phone2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="telefone" type="text" required="required" id="telefone" placeholder="Informe o seu telefone" title="Telefone" value='<?php echo $dados['telefone'];?>' size="25" maxlength="50">&nbsp;
             </td>
         </tr>
+		
         <tr>
           <td align="center"><label for="logradouro"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="endereco" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="endereco" type="text" required="required" id="endereco" placeholder="Informe o logradouro" title="endereco" size="25" maxlength="50">
+              <img title="logradouro" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="endereco" type="text" required="required" id="logradouro" placeholder="Informe o logradouro" title="Logradouro" value='<?php echo $dados['endereco'];?>' size="25" maxlength="50">
             </td>
           <td align="center"><label for="complemento">
-              <img title="complemento" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="complemento" type="text" id="complemento" placeholder="Informe o complemento" title="Complemento" size="25" maxlength="50">&nbsp;
+              <img title="Complemento" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="complemento" type="text" id="complemento" placeholder="Informe o complemento" title="Complemento" value='<?php echo $dados['complemento'];?>' size="25" maxlength="50">&nbsp;
             </td>
           <td align="center"><label for="bairro">
-              <img title="bairro" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="bairro" type="text" id="bairro" placeholder="Informe o bairro" title="Bairro" size="25" maxlength="50">&nbsp;
+              <img title="bairro" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="bairro" type="text" id="bairro" placeholder="Informe o bairro" title="Bairro" value='<?php echo $dados['bairro'];?>' size="25" maxlength="50">&nbsp;
             </td>
         </tr>
 		<tr>
@@ -474,10 +499,10 @@ $dalUsuario = new DALUsuario($conexao);
 		</tr>
         <tr>
           <td align="center"><label for="cidade"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="cidade" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="cidade" type="text" required="required" id="cidade" placeholder="Informe a cidade" title="Cidade" size="30" maxlength="50">&nbsp;
+              <img title="cidade" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="cidade" type="text" required="required" id="cidade" placeholder="Informe a cidade" title="Cidade" value='<?php echo $dados['cidade'];?>' size="30" maxlength="50">&nbsp;
             </td>
           <td align="center"><label for="estado"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="estado" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<select class='btn btn-group border-0 text-center font-weight-bold' name="estado" required="required" type="text">
+              <img title="estado" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<select class='btn btn-group border-0 text-center font-weight-bold' id="estado" name="estado" required="required" type="text">
 				  <option class='btn btn-group border-0 text-center font-weight-bold' value="AC">Acre</option>
 				  <option class='btn btn-group border-0 text-center font-weight-bold' value="AL">Alagoas</option>
 				  <option class='btn btn-group border-0 text-center font-weight-bold' value="AP">Amapá</option>
@@ -508,26 +533,25 @@ $dalUsuario = new DALUsuario($conexao);
 				</select>&nbsp;
             </td>
           <td align="center"><label for="cep"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="cep" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="cep" type="text" required="required" id="cep" placeholder="Informe o cep" title="CEP" size="25" maxlength="50">&nbsp;
-          </td>
-        </tr>
+              <img title="cep" class="rounded-circle" src="../../../images/1175922.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="cep" type="text" required="required" id="cep" placeholder="Informe o cep" title="CEP" value='<?php echo $dados['cep'];?>' size="25" maxlength="50">&nbsp;
+            </td>
+		</tr>
+		<tr>
+			<td><p>&nbsp;</p></td>
+		</tr>
       </table>
       <table class="form_menu2" align="center">
-	  <tr>
-			<td><p>&nbsp;</p></td>
-	  </tr>
         <tr>
           <td align="center"><label for="senha"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="senha" class="rounded-circle" src="../../../images/lock2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="senha" type="password" required="required" id="senha" placeholder="Informe a senha (Obrigatório)" title="Senha" size="25" maxlength="50">&nbsp;
+              <img title="senha" class="rounded-circle" src="../../../images/lock2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="senha" type="password" required="required" id="senha" placeholder="Informe a senha (Obrigatório)" title="Senha" value='<?php echo $dados['senha'];?>' size="25" maxlength="50">&nbsp;
             </td>
           <td align="center"><label for="confirmarSenha"><font class="font-weight-bold" color="#ff0000">*</font>
-              <img title="confirmarSenha" class="rounded-circle" src="../../../images/lock2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="confirmarSenha" type="password" required="required" id="confirmarSenha" placeholder="Repita a senha (Obrigatorio)" title="Confirmar senha" size="25" maxlength="50">&nbsp;
+              <img title="confirmarSenha" class="rounded-circle" src="../../../images/lock2.png" width="35" height="37" /></label>&nbsp;<input class='btn btn-group border-0 text-center font-weight-bold' name="confirmarSenha" type="password" required="required" id="confirmarSenha" placeholder="Repita a senha (Obrigatorio)" title="Confirmar senha" value='<?php echo $dados['senha'];?>' size="25" maxlength="50">&nbsp;
         </tr>
         <tr>        
       </table>
       <tr>
-		<p>&nbsp;</p>
-		<input class="btn btn-primary" type="submit" value="Cadastrar" name="cadastrar" />
+		<input name="alterar" type="submit" class="btn btn-primary" id="alterar" value="Alterar" />
         <!--<p align="right"><a href="#" class="btn btn-primary">Cadastrar</a></p>-->
         </blockquote>
       </tr>
@@ -579,7 +603,7 @@ Importadora Brasileira<br>
           <a href="#" target="_self"><img src="../../../images/email.svg" width="25" height="25" class="rounded-circle" alt="Email"></a>&nbsp;</a><a href="../Contato/ContatoChayds.php">sac@chayds.com.br</a>
           </address>
           <address>
-          <a href="https://www.facebook.com/vita.chayds.3" target="_blank"><img src="../../../images/2.gif" alt="Facebook" width="50" height="50" class="rounded-circle img-fluid"></a>&nbsp;<a href="#" target="_self"><img src='../../../images/3.gif' alt="Twitter" width="50" height="50" class="rounded-circle"></a>&nbsp;<a href="#" target="_self"><img src="../../../images/7.gif" alt="Youtube" width="50" height="50" class="rounded-circle img-fluid"></a>&nbsp;<a href="#" target="_self"><img src="../../../images/1.gif" alt="Instagran" width="50" height="50" class="rounded-circle"></a><!--&nbsp;<a href="https://allgoldenstars.webs.com/" target="_blank"><img src="../../images/ags1.jpg" alt="All Golden Stars" width="50" height="50" class="rounded-circle"></a>-->
+          <a href="https://www.facebook.com/vita.chayds.3" target="_blank"><img src="../../../images/2.gif" alt="Facebook" width="50" height="50" class="rounded-circle img-fluid"></a>&nbsp;&nbsp;<a href="#" target="_self"><img src='../../../images/3.gif' alt="Twitter" width="50" height="50" class="rounded-circle"></a>&nbsp;&nbsp;<a href="#" target="_self"><img src="../../../images/7.gif" alt="Youtube" width="50" height="50" class="rounded-circle img-fluid"></a>&nbsp;&nbsp;<a href="#" target="_self"><img src="../../../images/1.gif" alt="Instagran" width="50" height="50" class="rounded-circle"></a><!--&nbsp;&nbsp;<a href="https://allgoldenstars.webs.com/" target="_blank"><img src="../../images/ags1.jpg" alt="All Golden Stars" width="50" height="50" class="rounded-circle"></a>-->
 			  
           </address>
         </div>
@@ -601,8 +625,7 @@ Importadora Brasileira<br>
     <script src="../../../js/bootstrap-4.0.0.js"></script>
   </body>
 </html>
-<?php
-}
+<?php }
 else
 {
 	echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://www.chayds.com.br/index.php'>
