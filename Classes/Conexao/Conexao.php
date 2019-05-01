@@ -9,7 +9,7 @@ class Conexao
 	private $banco;
 	
 	//CONTRUTOR DA CLASSE
-	function __construct($servidor = "localhost", $usuario = "root", $senha="", $nomeBanco = "redeTeste")
+	function __construct($servidor = "localhost", $usuario = "root", $senha="", $nomeBanco = "RedeSocial")
 	{
 		$this->SetServidor($servidor);
 		$this->SetUsuario($usuario);

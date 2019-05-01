@@ -2,8 +2,9 @@
 class Usuario
 {
     //ATRIBUTOS
-	private $idUsuario;
+    private $idUsuario;
     private $nome;
+    private $documento;
     private $dataNascimento;
     private $dataCadastro;
     private $email;
@@ -16,10 +17,13 @@ class Usuario
     //ATRIBUTOS
         
     //CONSTRUTORES
-    public function __construct($idUsuario = "", $nome = "", $dataNascimento = "", $dataCadastro = "", $email = "", $senha = "", $nivelAcesso = "", $ddd = "", $telefone = "", $sexo = "", $imagem = "")
-	{
-		$this->idUsuario = $idUsuario;
+    
+    
+    public function __construct($idUsuario = "", $nome = "", $documento = "", $dataNascimento = "", $dataCadastro = "", $email = "", $senha = "", $nivelAcesso = "", $ddd = "", $telefone = "", $sexo = "", $imagem = "")
+    {
+        $this->idUsuario = $idUsuario;
         $this->nome = $nome;
+        $this->documento = $documento;
         $this->dataNascimento = $dataNascimento;
         $this->dataCadastro = $dataCadastro;
         $this->email = $email;
@@ -33,7 +37,16 @@ class Usuario
     //CONSTRUTORES
     
     //PROPRIEDASDES
-	public function getIdUsuario() {
+    
+    public function getDocumento() {
+        return $this->documento;
+    }
+
+    public function setDocumento($documento) {
+        $this->documento = $documento;
+    }
+        
+    public function getIdUsuario() {
         return $this->idUsuario;
     }
 	
