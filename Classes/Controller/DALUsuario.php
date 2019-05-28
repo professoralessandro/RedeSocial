@@ -34,6 +34,37 @@ class DALUsuario {
         $banco->query($sqlComand);
         $this->conexao->Desconectar();
     }
+	
+	public function inserirAmigo($DadosUsuario, $idAmigo)
+    {
+		$ultimoAmigo = 1;
+		
+		for($i = 1; $i < 7; $i++)
+		{
+			if(count($DadosUsuario['idAmigo'.$i]) > 0)
+			{
+				$ultimoAmigo ++;
+			}
+			else
+			{
+			}
+		}
+		
+		if($ultimoAmigo == 0)
+		{
+			$ultimoAmigo ++;
+		}
+		else if($ultimoAmigo == 0)
+		{
+			return false;
+		}
+		
+        $sqlComand = "UPDATE tbUsuario SET idAmigo". $ultimoAmigo." = ".$idAmigo." where idUsuario =".$DadosUsuario['idUsuario'];
+		
+        $banco = $this->conexao->GetBanco();
+        $banco->query($sqlComand);
+        $this->conexao->Desconectar();
+    }
 
 //INSERIR
 
@@ -62,7 +93,8 @@ class DALUsuario {
         $this->conexao->Desconectar();
     }
 
-    public function localizarUsuario($id) {
+    public function localizarUsuario($id)
+	{
         $sqlComand = "select * from tbUsuario where idUsuario = " . $id;
 
         $banco = $this->conexao->GetBanco();

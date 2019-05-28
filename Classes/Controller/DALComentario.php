@@ -63,6 +63,39 @@ class DALComentario {
         $banco->query($sqlComand);
         $this->conexao->Desconectar();
     }
+	
+	//RESPONDER COMENTARIO
+	public function responderComentario($DadosComentario, $resposta)
+    {
+		$ultimoComentario = 1;
+		
+		for($i = 1; $i < 4; $i++)
+		{
+			if(count($DadosComentario['resposta'.$i]) > 0)
+			{
+				$ultimoComentario ++;
+			}
+			else
+			{
+			}
+		}
+		
+		if($ultimoComentario == 0)
+		{
+			$ultimoComentario ++;
+		}
+		else if($ultimoComentario == 0)
+		{
+			return false;
+		}
+		
+        $sqlComand = "UPDATE tbComentario SET resposta". $ultimoComentario." = '".$resposta."' where idComentario = ".$DadosComentario['idComentario'];
+		
+        $banco = $this->conexao->GetBanco();
+        $banco->query($sqlComand);
+        $this->conexao->Desconectar();
+    }
+	//RESPONDER COMENTARIO
 
     public function excluirComentario($idComentario) {
         $sqlComand = "delete from tbComentario where idComentario = " . $idComentario;
