@@ -52,7 +52,7 @@ if (isset($_SESSION['usuarioNome']))
 		$conexao = new Conexao();
 		$dalComentario = new DALComentario($conexao);
 		
-		$idComentario = $_POST['idComentario'];
+		$idComentario = $_POST['idComent'];
 		
 		$resposta = $_POST['message'];
 		
@@ -60,6 +60,8 @@ if (isset($_SESSION['usuarioNome']))
 		
 		$dados1 = mysqli_fetch_array($comentario);
 		
+		print_r($dados1);
+		/*
 		$resultResposta = $dalComentario->responderComentario($dados1, $resposta);
 		
 		if (!$resultResposta) {
@@ -73,7 +75,7 @@ if (isset($_SESSION['usuarioNome']))
             alert(\"Erro ao responder o comentario. Tente novamente mais tarde.\");
             </script>";
         }
-		
+		*/
 		
 	}
 	else if(isset($_POST['adicionarAmigo']))
@@ -330,7 +332,7 @@ if (isset($_SESSION['usuarioNome']))
         ?>
                                                     <tr>
                                                         <th><h3><?php echo($dadosComentario['nomeUsuario']); ?></h3>
-															<input hidden="" type="text" name="idComentario" value="<?php echo($dadosComentario['idComentario']); ?>" >
+															<input hidden="" type="text" name="idComent" value="<?php echo($dadosComentario['idComentario']); ?>" >
 															<input hidden="" type="text" name="responderMensagem" value="true" >
                                                             <p><?php echo($dadosComentario['comentario']); ?></p></th>
                                                     </tr>  

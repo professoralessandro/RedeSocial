@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `redeSocial`.`TbUsuario` (
   `dataCadastro` VARCHAR(45) NULL,
   `email` VARCHAR(60) NULL,
   `senha` VARCHAR(50) NULL,
-  `nivelAcesso`enum('PACIENTE','MEDICO','ADMINISTRADOR') NULL,
+  `nivelAcesso`enum('PACIENTE','MEDICO','ADMINISTRADOR','OUTROS') NULL,
   `ddd` VARCHAR(5) NULL,
   `telefone` VARCHAR(15) NULL,
   `sexo` VARCHAR(10) NULL,
@@ -57,12 +57,12 @@ CREATE TABLE IF NOT EXISTS `redeSocial`.`tbComentario` (
   `idComentario` INT NOT NULL AUTO_INCREMENT,
   `nomeUsuario` VARCHAR(50) NULL,
   `emailUsuario` VARCHAR(60) NULL,
-  `dataHora` DATETIME NULL,
   `comentario` TEXT NULL,
+  `dataHora` DATETIME NULL,
   `resposta1` TEXT NULL,
   `resposta2` TEXT NULL,
   `resposta3` TEXT NULL,
-  `idDestinatario` INT NULL,
+  `idUsuario` INT NULL,
   `TbUsuario_idUsuario` INT NOT NULL,
   PRIMARY KEY (`idComentario`),
   INDEX `fk_tbComentario_TbUsuario_idx` (`TbUsuario_idUsuario` ASC),
@@ -78,12 +78,12 @@ SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
-INSERT INTO tbUsuario(nome, documento, dataNascimento, dataCadastro, email, senha, nivelAcesso, ddd, telefone, sexo, imagem, idAmigo1, idAmigo2, totulo1, titulo2, descricao1, descricao2)
+INSERT INTO tbUsuario(nome, documento, dataNascimento, dataCadastro, email, senha, nivelAcesso, ddd, telefone, sexo, imagem, idAmigo1, idAmigo2, titulo1, titulo2, descricao1, descricao2)
 VALUES('Alessandro dos Santos', '123456','1990-03-28',curdate(),'alessandro@rede.com.br','123456','ADMINISTRADOR','013','33424849','M', '8aca6235-81fb-47c8-9f24-23a5a886bd1b.jpg', 2, 3, 'Descricao de testes 1', 'Deixe o Jaleko te Ajudar nos 6 Anos Mais Importantes da Sua Vida! Muito mais que medicina. Estude em pouco tempo. Preço que Cabe no Bolso. Estude Onde Quiser. Mais de 100h de Aulas. Aprenda e reforce. +6mil Questões Comentadas. Cursos: Anatomia, Fisiologia, Bioquímica, Cirur', 'Descricao de testes 2', 'Deixe o Jaleko te Ajudar nos 6 Anos Mais Importantes da Sua Vida! Muito mais que medicina. Estude em pouco tempo. Preço que Cabe no Bolso. Estude Onde Quiser. Mais de 100h de Aulas. Aprenda e reforce. +6mil Questões Comentadas. Cursos: Anatomia, Fisiologia, Bioquímica, Cirur'),
 ('Lucas Santos','123456','1990-03-28',curdate(),'lucas@rede.com.br','123456','ADMINISTRADOR','013','33424849','M', '8aca6235-81fb-47c8-9f24-23a5a886bd1b.jpg', 1, 3, 'Descricao de testes 1', 'Deixe o Jaleko te Ajudar nos 6 Anos Mais Importantes da Sua Vida! Muito mais que medicina. Estude em pouco tempo. Preço que Cabe no Bolso. Estude Onde Quiser. Mais de 100h de Aulas. Aprenda e reforce. +6mil Questões Comentadas. Cursos: Anatomia, Fisiologia, Bioquímica, Cirur', 'Descricao de testes 2', 'Deixe o Jaleko te Ajudar nos 6 Anos Mais Importantes da Sua Vida! Muito mais que medicina. Estude em pouco tempo. Preço que Cabe no Bolso. Estude Onde Quiser. Mais de 100h de Aulas. Aprenda e reforce. +6mil Questões Comentadas. Cursos: Anatomia, Fisiologia, Bioquímica, Cirur'),
 ('Thiago', '123456','1990-03-28',curdate(),'thiago@rede.com.br','123456','ADMINISTRADOR','013','33424849','M', '8aca6235-81fb-47c8-9f24-23a5a886bd1b.jpg', 1, 2, 'Descricao de testes 1', 'Deixe o Jaleko te Ajudar nos 6 Anos Mais Importantes da Sua Vida! Muito mais que medicina. Estude em pouco tempo. Preço que Cabe no Bolso. Estude Onde Quiser. Mais de 100h de Aulas. Aprenda e reforce. +6mil Questões Comentadas. Cursos: Anatomia, Fisiologia, Bioquímica, Cirur', 'Descricao de testes 2', 'Deixe o Jaleko te Ajudar nos 6 Anos Mais Importantes da Sua Vida! Muito mais que medicina. Estude em pouco tempo. Preço que Cabe no Bolso. Estude Onde Quiser. Mais de 100h de Aulas. Aprenda e reforce. +6mil Questões Comentadas. Cursos: Anatomia, Fisiologia, Bioquímica, Cirur')
 
-INSERT INTO tbComentario(nomeUsuario, emailUsuario, comentario, resposta1, resposta2, resposta3, TbUsuario_idUsuario, dataHora)
-VALUES('Alessandro dos Santo','alessandro@rede.com.br', 'Comentario Teste 1', 'Resposta teste 2', 'Resposta teste2', 'Resposta teste 3', 1, curdate()),
-('Alessandro dos Santo','alessandro@rede.com.br', 'Comentario Teste 1', 'Resposta teste 2', 'Resposta teste2', 'Resposta teste 3', 1, curdate()),
-('Alessandro dos Santo','alessandro@rede.com.br', 'Comentario Teste 1', 'Resposta teste 2', 'Resposta teste2', 'Resposta teste 3', 1,curdate())
+INSERT INTO tbComentario(nomeUsuario, emailUsuario, comentario, dataHora, resposta1, resposta2, resposta3,idUsuario, TbUsuario_idUsuario)
+VALUES('Alessandro dos Santo','alessandro@rede.com.br', 'Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 Comentario Teste 1 ', curdate(), 'Resposta teste 2', 'Resposta teste2', 'Resposta teste 3', 1, 2),
+('Alessandro dos Santo','alessandro@rede.com.br', 'Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2 Comentario Teste 2', curdate(), 'Resposta teste 2', 'Resposta teste2', 'Resposta teste 3', 1, 3),
+('Alessandro dos Santo','alessandro@rede.com.br', 'Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3 Comentario Teste 3',curdate(), 'Resposta teste 2', 'Resposta teste2', 'Resposta teste 3', 1, 1)
