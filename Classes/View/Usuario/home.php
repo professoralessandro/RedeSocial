@@ -11,8 +11,7 @@ if (is_null($idUsuario) || $idUsuario == '') {
     $idUsuario = $_SESSION['usuarioId'];
 }
 
-if (isset($_SESSION['usuarioNome']))
-{
+if (isset($_SESSION['usuarioNome'])) {
 
     $comexao = new Conexao();
     $dalUsuario = new DALUsuario($comexao);
@@ -32,7 +31,7 @@ if (isset($_SESSION['usuarioNome']))
         $comentario = $_POST['message'];
 
         $comentario = new Comentario('', $idDestinatario, $idUsuario, $dataHora, $email, $nome, $comentario);
-        
+
         $result = $dalComentario->comentar($comentario);
 
         if (!$result) {
@@ -47,53 +46,49 @@ if (isset($_SESSION['usuarioNome']))
             </script>";
         }
     }
-	else if (isset($_POST['responderMensagem']))
-	{
-		$conexao = new Conexao();
-		$dalComentario = new DALComentario($conexao);
+    else if (isset($_POST['responderMensagem']))
+    {   
+        $conexao = new Conexao();
+        $dalComentario = new DALComentario($conexao);
+
+        $idComente = $_POST['idComente'];
 		
-		$idComentario = $_POST['idComent'];
-		
-		$resposta = $_POST['message'];
-		
-		$comentario = $dalComentario->localizarComentario($idComentario);
-		
-		$dados1 = mysqli_fetch_array($comentario);
-		
-		print_r($dados1);
-		/*
-		$resultResposta = $dalComentario->responderComentario($dados1, $resposta);
-		
-		if (!$resultResposta) {
-            echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://localhost/Classes/View/Usuario/home.php'>
-            <script type= \"text/javascript\">
-            alert(\"A sua resposta foi inserida com sucesso.\");
-            </script>";
+		echo($idComente);
+
+        $resposta = $_POST['message'];
+
+        $comentario = $dalComentario->localizarComentario($idComente);
+
+        $dados1 = mysqli_fetch_array($comentario);
+        
+        $resultResposta = $dalComentario->responderComentario($dados1, $resposta);
+
+        if (!$resultResposta) {
+        echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://localhost/Classes/View/Usuario/home.php'>
+          <script type= \"text/javascript\">
+          alert(\"A sua resposta foi inserida com sucesso.\");
+          </script>";
         } else {
-            echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://localhost/Classes/View/Usuario/home.php'>
-            <script type= \"text/javascript\">
-            alert(\"Erro ao responder o comentario. Tente novamente mais tarde.\");
-            </script>";
+          echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://localhost/Classes/View/Usuario/home.php'>
+          <script type= \"text/javascript\">
+          alert(\"Erro ao responder o comentario. Tente novamente mais tarde.\");
+          </script>";
         }
-		*/
-		
-	}
-	else if(isset($_POST['adicionarAmigo']))
-	{
-		$conexao = new Conexao();
-		$dalUsuario = new DALUsuario($conexao);
-		
-		$usuario = $dalUsuario->localizarUsuario($_SESSION['usuarioId']);
-		
-		$dados1 = mysqli_fetch_array($usuario);
-		
-		$idAmigo = $_POST['idAmigo'];
-		
-		$ultimoAmigo = $_POST['idUltimoAmigo'];
-		
-		$resultAmigo = $dalUsuario->inserirAmigo($dados1, $idAmigo);
-		
-		if (!$resultAmigo) {
+    } else if (isset($_POST['adicionarAmigo'])) {
+        $conexao = new Conexao();
+        $dalUsuario = new DALUsuario($conexao);
+
+        $usuario = $dalUsuario->localizarUsuario($_SESSION['usuarioId']);
+
+        $dados1 = mysqli_fetch_array($usuario);
+
+        $idAmigo = $_POST['idAmigo'];
+
+        $ultimoAmigo = $_POST['idUltimoAmigo'];
+
+        $resultAmigo = $dalUsuario->inserirAmigo($dados1, $idAmigo);
+
+        if (!$resultAmigo) {
             echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=http://localhost/Classes/View/Usuario/home.php'>
             <script type= \"text/javascript\">
             alert(\"O seu novo amigo foi adicionado com sucesso.\");
@@ -104,8 +99,7 @@ if (isset($_SESSION['usuarioNome']))
             alert(\"Erro ao adicionar um novo amigo. Tente novamente mais tarde.\");
             </script>";
         }
-	}
-	
+    }
     ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -149,11 +143,11 @@ if (isset($_SESSION['usuarioNome']))
     if (isset($_SESSION['usuarioNome']) && $_SESSION['usuarioNome'] != null) {
         ?>
                                     <img class="rounded-circle" src='<?php echo "../../../imagens/" . $_SESSION['usuarioImagem']; ?>' alt="foto de perfil" width="36" height="33" id="imagem" title="foto de perfil" />
-                                    <?php
-                                    $conexao = new Conexao();
-                                    $dalUsuario = new DALUsuario($conexao);
-                                    echo($dalUsuario->primeiroNome($_SESSION['usuarioNome']));
-                                    ?>
+        <?php
+        $conexao = new Conexao();
+        $dalUsuario = new DALUsuario($conexao);
+        echo($dalUsuario->primeiroNome($_SESSION['usuarioNome']));
+        ?>
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <table>
@@ -175,8 +169,8 @@ if (isset($_SESSION['usuarioNome']))
     } else {
         ?> <!--  INICIO DO MENU DROP COM USUARIO DESLOGADO -->
                             <img class="rounded-circle" src="../../../imagens/profile.png" alt="foto de perfil" width="36" height="33" id="imagem" title="foto de perfil" />
-                            <?php echo("Usuário"); ?>
-                        <?php } ?>
+        <?php echo("Usuário"); ?>
+    <?php } ?>
                         </a>
                         <div align="center" class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <form name="formLogin" action="#" target="_self" method="post">
@@ -225,20 +219,20 @@ if (isset($_SESSION['usuarioNome']))
                         <div class="row">
                             <div class="col-12 mb-2 text-center">
                                 <h2>SOBRE <?php
-                    $resultado = $dalUsuario->localizarUsuario($idUsuario);
-                    $dados = mysqli_fetch_array($resultado);
-                    echo(strtoupper($dados['nome']));
-                    ?> </h2>
+    $resultado = $dalUsuario->localizarUsuario($idUsuario);
+    $dados = mysqli_fetch_array($resultado);
+    echo(strtoupper($dados['nome']));
+    ?> </h2>
                             </div>
                         </div>
                     </div>
                     <div class="container">
                         <table class="table table">
                             <tr>
-                                <?php
-                                for ($i = 1; $i < 4; $i ++) {
-                                    if (isset($dados['titulo' . $i]) && $dados['titulo' . $i] != null && $dados['titulo' . $i] != '' && isset($dados['descricao' . $i]) && $dados['descricao' . $i] != null && $dados['descricao' . $i] != '') {
-                                        ?>
+                                    <?php
+                                    for ($i = 1; $i < 4; $i ++) {
+                                        if (isset($dados['titulo' . $i]) && $dados['titulo' . $i] != null && $dados['titulo' . $i] != '' && isset($dados['descricao' . $i]) && $dados['descricao' . $i] != null && $dados['descricao' . $i] != '') {
+                                            ?>
                                         <th>
                                             <div class="row">
                                                 <div class="col-sm-8 col-lg-12">
@@ -271,11 +265,9 @@ if (isset($_SESSION['usuarioNome']))
                 <div class="container ">
                     <div class="row">
     <?php
-    for ($i = 1; $i < 7; $i ++)
-	{
-		$idUltimoAmigo = 0;
-        if (isset($dados['idAmigo' . $i]) && $dados['idAmigo' . $i] != null)
-		{
+    for ($i = 1; $i < 7; $i ++) {
+        $idUltimoAmigo = 0;
+        if (isset($dados['idAmigo' . $i]) && $dados['idAmigo' . $i] != null) {
             //$conexao = new Conexao(); 
             //$dalUsuario = new DALUsuario($conexao);
             $resultadoAmigo = $dalUsuario->localizarUsuario($dados['idAmigo' . $i]);
@@ -284,38 +276,36 @@ if (isset($_SESSION['usuarioNome']))
                                 <div class="col-lg-4 col-md-6 col-sm-12 text-center">
                                     <img class="rounded-circle" alt="140x140" style="width: 140px; height: 140px;" src="../../../imagens/<?php echo($dadosAmigo['imagem']); ?>" data-holder-rendered="true">
                                     <h2><?php echo($dadosAmigo['nome']); ?></h2>
-                                    <h4><?php echo($dalUsuario->primeiroNome($dadosAmigo['descricao' . $i])); $idUltimoAmigo ++ ?></h4>
+                                    <h4><?php echo($dalUsuario->primeiroNome($dadosAmigo['descricao' . $i]));
+                    $idUltimoAmigo ++ ?></h4>
                                 </div>
-        <?php }
-			  else
-			  {
-				  $idUltimoAmigo = 'n';
-			  }
-						?>
-                        <?php } ?>
+                            <?php
+                            } else {
+                                $idUltimoAmigo = 'n';
+                            }
+                            ?>
+    <?php } ?>
                     </div>
                     <!-- FIM GALERIA DE AMIGOS -->
-                    <?php
-						if($dados['idUsuario'] == $_SESSION['usuarioId'])
-						{
-							
-						}
-						else
-						{ ?>
-						<hr>
-							<div class="container">
-                   <form name="AdicionarAmigo" action="#" target="_self" method="post">
-                    <div class="row">
-                        <div align="right" class="col-20 mb-2"><!-- IMAGEM MAIS <img class="rounded-circle" src="../../../images/adicionar-botao_318-32466.png" width="25" height="25" />-->
-                          	<input hidden="" name="idUltimoAmigo" type="text" value="<?php echo($idUltimoAmigo); ?>" >
-                          	<input hidden="" name="idAmigo" type="text" value="<?php echo($dados['idUsuario']); ?>" >
-                           	<input class="btn btn-block btn-lg btn-primary" type="submit" value="ADICIONAR <?php echo(strtoupper($dalUsuario->primeiroNome($dados['nome']))); ?>" name="adicionarAmigo" />
+                        <?php
+                        if ($dados['idUsuario'] == $_SESSION['usuarioId']) {
+                            
+                        } else {
+                            ?>
+                        <hr>
+                        <div class="container">
+                            <form name="AdicionarAmigo" action="#" target="_self" method="post">
+                                <div class="row">
+                                    <div align="right" class="col-20 mb-2"><!-- IMAGEM MAIS <img class="rounded-circle" src="../../../images/adicionar-botao_318-32466.png" width="25" height="25" />-->
+                                        <input hidden="" name="idUltimoAmigo" type="text" value="<?php echo($idUltimoAmigo); ?>" >
+                                        <input hidden="" name="idAmigo" type="text" value="<?php echo($dados['idUsuario']); ?>" >
+                                        <input class="btn btn-block btn-lg btn-primary" type="submit" value="ADICIONAR <?php echo(strtoupper($dalUsuario->primeiroNome($dados['nome']))); ?>" name="adicionarAmigo" />
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </div>
-                   </form>
-                </div>
-				   <?php } ?>
-                <hr>
+    <?php } ?>
+                    <hr>
                     <div class="container">
                         <div class="row">
                             <div class="col-12 col-md-20 mx-auto">
@@ -327,27 +317,25 @@ if (isset($_SESSION['usuarioNome']))
     $dalComentario = new DALComentario($conexao);
     $resultadoComentario = $dalComentario->localizarComentariosUsuario($idUsuario);
     $contador = 0;
-    while ($dadosComentario = mysqli_fetch_array($resultadoComentario))
-            {
+    while ($dadosComentario = mysqli_fetch_array($resultadoComentario)) {
         ?>
                                                     <tr>
-                                                        <th><h3><?php echo($dadosComentario['nomeUsuario']); ?></h3>
-															<input hidden="" type="text" name="idComent" value="<?php echo($dadosComentario['idComentario']); ?>" >
-															<input hidden="" type="text" name="responderMensagem" value="true" >
+                                                        <th><h3><?php echo($dadosComentario['nomeUsuario']);?></h3>
+                                                            <input hidden="" type="text" name="responderMensagem" value="true" >
                                                             <p><?php echo($dadosComentario['comentario']); ?></p></th>
                                                     </tr>  
-        <?php
-        for ($i = 1; $i < 4; $i++) {
-            if (isset($dadosComentario['resposta' . $i]) && $dadosComentario['resposta' . $i] != null && $dadosComentario['resposta' . $i] != "") {
-                ?>
+                                                    <?php
+                                                    for ($i = 1; $i < 4; $i++) {
+                                                        if (isset($dadosComentario['resposta' . $i]) && $dadosComentario['resposta' . $i] != null && $dadosComentario['resposta' . $i] != "") {
+                                                            ?>
                                                             <tr>
-                                                                <td><?php echo($dadosComentario['resposta' . $i]); ?></td>
+                                                                <td><?php echo($dadosComentario['resposta' . $i]); ?> <br></td>
                                                             </tr>
             <?php } ?>
-                                                    <?php } ?>
-                                                    <?php
-                                                    if ($_SESSION['usuarioId'] == $idUsuario) {
-                                                        ?>
+        <?php } ?>
+        <?php
+        if ($_SESSION['usuarioId'] == $idUsuario) {
+            ?>
                                                         <form name="enviarResposta" action="#" target="_self" method="post">
                                                             <table class="table table-striped">
                                                                 <tr>
@@ -360,6 +348,7 @@ if (isset($_SESSION['usuarioNome']))
                                                                     <div class="form-group">
                                                                         <label for="name">Nome</label>
                                                                         <h4><?php echo($_SESSION['usuarioNome']); ?></h4>
+                                                                        <input hidden="" name="idComente" type="text" value="<?php echo($dadosComentario['idComentario']) ?>" >
                                                                         <input name="email" type="text" hidden="" value="<?php echo($_SESSION['usuarioNome']); ?>">
                                                                         <input name="idDestinatario" type="text" hidden="" value="<?php echo($idUsuario); ?>">
                                                                         <span id="nameHelp" class="form-text text-muted" style="display: none;">Please enter your name.</span>
@@ -376,13 +365,13 @@ if (isset($_SESSION['usuarioNome']))
                                                                         <span id="messageHelp" class="form-text text-muted" style="display: none;">Please enter a message.</span>
                                                                     </div>
                                                                     <input class="btn btn-block btn-lg btn-primary" type="submit" value="Responder" name="responderMensagem" />
-                                                                    <a class="btn btn-block btn-lg btn-danger" href="deletarComentario.php?idComentario =<?php echo $dadosComentario['idComentario'];?>&idUsuario = <?php echo $_SESSION['usuarioId'];?>">Deletar Comentário</a>
+                                                                    <a class="btn btn-block btn-lg btn-danger" href="deletarComentario.php?idComentario =<?php echo $dadosComentario['idComentario']; ?>&idUsuario = <?php echo $_SESSION['usuarioId']; ?>">Deletar Comentário</a>
 
                                                                 </div>
                                                                 </tr>
                                                             </table>
                                                         </form>
-        <?php
+            <?php
         }
     }
     if ($_SESSION['usuarioId'] != $idUsuario) {
@@ -398,11 +387,9 @@ if (isset($_SESSION['usuarioNome']))
 
                                                                 <div class="form-group">
                                                                     <label for="name">Nome</label>
-                                                                    <h4><?php echo($_SESSION['usuarioNome']); ?></h4>
+                                                                    <h4><?php $idDestinatario = 1; echo($_SESSION['usuarioNome']); ?></h4>
                                                                     <input name="email" type="text" hidden="" value="<?php echo($_SESSION['usuarioNome']); ?>">
-                                                                    <input name="idDestinatario" type="text" hidden="" value="<?php $idDestinatario = 1;
-                                            echo($idUsuario);
-                                            ?>">
+                                                                    <input name="idDestinatario" type="text" hidden="" value="<?php echo($idUsuario); ?>">
                                                                     <span id="nameHelp" class="form-text text-muted" style="display: none;">Please enter your name.</span>
                                                                 </div>
                                                                 <div class="form-group">
@@ -422,7 +409,7 @@ if (isset($_SESSION['usuarioNome']))
                                                             </tr>
                                                         </table>
                                                     </form>
-                                                <?php } ?>
+    <?php } ?>
                                         </div>
                                         <br>
                                     </div>
@@ -451,7 +438,9 @@ if (isset($_SESSION['usuarioNome']))
         </body>
     </html>
     <?php
-} else {
+}
+else
+{
     echo "<META HTTP-EQUIV=REFRESH CONTENT ='0;URL=../../../index.php'>
     <script type= \"text/javascript\">
     alert(\"você não tem autorização para acessar a esta página.\");

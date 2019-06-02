@@ -3,12 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/xampp/htdocs/RedeSocial/Classes/Model/Comentario.php</file>
-            <file>file:/E:/xampp/htdocs/RedeSocial/Classes/View/Alterar/AlterarUsuario.php</file>
-            <file>file:/E:/xampp/htdocs/RedeSocial/Classes/View/Usuario/deletarComentario.php</file>
             <file>file:/E:/xampp/htdocs/RedeSocial/Classes/View/Usuario/home.php</file>
-            <file>file:/E:/xampp/htdocs/RedeSocial/Classes/Conexao/Validacao.php</file>
-            <file>file:/E:/xampp/htdocs/RedeSocial/Classes/Controller/DALComentario.php</file>
         </group>
     </open-files>
 </project-private>
